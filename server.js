@@ -4,6 +4,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const cron = require('node-cron');
+const axios = require('axios');
 
 // Load environment variables
 dotenv.config();
@@ -55,7 +57,18 @@ app.get('/', (req, res) => {
   res.send('Backend is running...');
 });
 
+cron.schedule('*/1 * * * *', async () => {
+  try {
+    const url = 'https://invisible-threads-backend-ai.onrender.com';
+    const response = await axios.get(url);
+    console.log(`Pinged server: ${response.status}`);
+  } catch (error) {
+    console.error('Error pinging server:', error.message);
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
