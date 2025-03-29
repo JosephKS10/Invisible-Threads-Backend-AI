@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
   res.send('Backend is running...');
 });
 
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('*/10 * * * *', async () => {
   try {
     const url = 'https://invisible-threads-backend-ai.onrender.com';
     const response = await axios.get(url);
