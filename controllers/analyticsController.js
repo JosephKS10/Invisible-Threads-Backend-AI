@@ -44,7 +44,6 @@ exports.saveUserResponse = async (userMessage, chatbotReply, sentiment) => {
 
 exports.getAnalytics = async (req, res) => {
     try {
-        // Pagination support
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100;
         const skip = (page - 1) * limit;
@@ -58,7 +57,8 @@ exports.getAnalytics = async (req, res) => {
             .limit(limit)
             .select('-__v'); // Exclude version key
 
-        res.json({
+        res.status(200).json({
+            success: true,
             totalCount,
             totalPages: Math.ceil(totalCount / limit),
             currentPage: page,
@@ -67,7 +67,7 @@ exports.getAnalytics = async (req, res) => {
     } catch (error) {
         console.error("Analytics Fetch Error:", error);
         res.status(500).json({ 
-            error: "Error fetching analytics data.",
+            error: "Failed to retrieve analytics",
             details: error.message 
         });
     }
@@ -93,7 +93,8 @@ exports.getAnalyticsSummary = async (req, res) => {
             }
         ]);
 
-        res.json(summary[0] || { 
+        res.status(200).json(summary[0] || { 
+            success: true,
             totalInteractions: 0, 
             positiveSentiments: 0, 
             negativeSentiments: 0,
@@ -102,9 +103,10 @@ exports.getAnalyticsSummary = async (req, res) => {
     } catch (error) {
         console.error("Analytics Summary Error:", error);
         res.status(500).json({ 
-            error: "Error generating analytics summary.",
+            error: "Failed to generate analytics summary",
             details: error.message 
         });
     }
 };
+
 

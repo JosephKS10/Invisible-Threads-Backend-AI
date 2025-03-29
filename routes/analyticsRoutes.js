@@ -48,33 +48,7 @@ router.post("/save", validateSaveRequest, async (req, res) => {
     }
 });
 
-// Route to get analytics data with optional pagination
-router.get("/data", async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 100;
-
-        const result = await getAnalytics(page, limit);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ 
-            error: 'Failed to retrieve analytics',
-            details: error.message 
-        });
-    }
-});
-
-// New route for analytics summary
-router.get("/summary", async (req, res) => {
-    try {
-        const summary = await getAnalyticsSummary();
-        res.json(summary);
-    } catch (error) {
-        res.status(500).json({ 
-            error: 'Failed to generate analytics summary',
-            details: error.message 
-        });
-    }
-});
+router.get("/data", getAnalytics);
+router.get("/summary", getAnalyticsSummary);
 
 module.exports = router;

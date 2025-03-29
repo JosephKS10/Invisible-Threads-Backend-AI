@@ -1,27 +1,24 @@
 const express =  require('express');
 const { getChatbotResponse } =  require('../controllers/chatbotController.js');
 const rateLimit = require('express-rate-limit');
-const RedisStore = require('rate-limit-redis');
-// Middleware for input validation
+
+
 const validateChatbotRequest = (req, res, next) => {
-    const { userMessage } = req.body;
+    const { userMessage, currentQuestion } = req.body;
     
-    if (!userMessage) {
+    if (!userMessage || !currentQuestion) {
         return res.status(400).json({ 
-            error: 'User message is required' 
+            error: 'Both user message and current question are required' 
         });
     }
 
-    // Optional: Add more sophisticated validation
     if (userMessage.length > 1000) {
         return res.status(400).json({ 
             error: 'Message is too long (max 1000 characters)' 
         });
     }
 
-    // Optional: Basic sanitization
     req.body.userMessage = userMessage.trim();
-
     next();
 };
 
@@ -38,18 +35,12 @@ const router = express.Router();
 // Main chatbot response route
 router.post("/respond", 
     validateChatbotRequest,
-    limiter, // Apply rate limiting
+    limiter,
     async (req, res) => {
         try {
-            const { userMessage } = req.body;
-            
-            const result = await getChatbotResponse(req, res);
-            
-            // Additional logging or analytics can be added here
-            console.log(`Chatbot interaction: ${userMessage.substring(0, 50)}...`);
-            
-            // If the controller handles the response directly, 
-            // this might be redundant
+            const { userMessage, currentQuestion } = req.body;
+            const result = await getChatbotResponse(req, res, currentQuestion);
+            console.log(`Chatbot interaction: ${currentQuestion.substring(0, 30)}...`);
             return res.json(result);
         } catch (error) {
             console.error('Chatbot Route Error:', error);
@@ -58,6 +49,7 @@ router.post("/respond",
                 details: error.message 
             });
         }
-});
+    }
+);
 
 module.exports = router;
